@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "home": "Home",
+    "articles": "News",
+    "artists": "Artists",
+    "search": "Search"
+  },
+  "home": {
+    "hero_title": "K-Entertainment News",
+    "hero_subtitle": "Latest TenAsia articles in Korean & English",
+    "latest_articles": "Latest News",
+    "popular_artists": "Popular Artists",
+    "view_all": "View All"
+  },
+  "article": {
+    "read_original": "Read Original",
+    "published": "Published",
+    "author": "Author",
+    "related": "Related Articles",
+    "korean": "Korean",
+    "english": "English",
+    "no_english": "English translation coming soon.",
+    "original_korean": "Original Korean"
+  },
+  "artist": {
+    "birth_date": "Birth Date",
+    "nationality": "Nationality",
+    "mbti": "MBTI",
+    "blood_type": "Blood Type",
+    "height": "Height",
+    "weight": "Weight",
+    "group": "Group",
+    "news": "Related News",
+    "verified": "Verified",
+    "members": "Members"
+  },
+  "group": {
+    "debut": "Debut",
+    "label": "Label",
+    "fandom": "Fandom",
+    "status": "Status",
+    "members": "Members",
+    "news": "Related News",
+    "active": "Active",
+    "hiatus": "On Hiatus",
+    "disbanded": "Disbanded",
+    "solo_only": "Solo Activities"
+  },
+  "search": {
+    "placeholder": "Search artists, groups, news...",
+    "results": "Search Results",
+    "articles": "Articles",
+    "artists": "Artists",
+    "groups": "Groups",
+    "no_results": "No results found."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "load_more": "Load more",
+    "back": "Back"
+  }
+}

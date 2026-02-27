@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "home": "홈",
+    "articles": "기사",
+    "artists": "아티스트",
+    "search": "검색"
+  },
+  "home": {
+    "hero_title": "K-엔터 최신 뉴스",
+    "hero_subtitle": "텐아시아 최신 기사를 한국어·영어로 만나보세요",
+    "latest_articles": "최신 기사",
+    "popular_artists": "인기 아티스트",
+    "view_all": "전체 보기"
+  },
+  "article": {
+    "read_original": "원문 보기",
+    "published": "발행일",
+    "author": "작성자",
+    "related": "관련 기사",
+    "korean": "한국어",
+    "english": "영어",
+    "no_english": "영문 번역이 아직 준비 중입니다.",
+    "original_korean": "한국어 원문"
+  },
+  "artist": {
+    "birth_date": "생년월일",
+    "nationality": "국적",
+    "mbti": "MBTI",
+    "blood_type": "혈액형",
+    "height": "신장",
+    "weight": "체중",
+    "group": "그룹",
+    "news": "관련 뉴스",
+    "verified": "공식 확인",
+    "members": "멤버"
+  },
+  "group": {
+    "debut": "데뷔일",
+    "label": "소속사",
+    "fandom": "팬덤",
+    "status": "활동 상태",
+    "members": "멤버",
+    "news": "관련 뉴스",
+    "active": "활동 중",
+    "hiatus": "활동 중단",
+    "disbanded": "해체",
+    "solo_only": "솔로 활동"
+  },
+  "search": {
+    "placeholder": "아티스트·그룹·기사 검색",
+    "results": "검색 결과",
+    "articles": "기사",
+    "artists": "아티스트",
+    "groups": "그룹",
+    "no_results": "검색 결과가 없습니다."
+  },
+  "common": {
+    "loading": "불러오는 중...",
+    "error": "오류가 발생했습니다.",
+    "load_more": "더 보기",
+    "back": "뒤로"
+  }
+}
