@@ -6,11 +6,14 @@
     "search": "검색"
   },
   "home": {
-    "hero_title": "K-엔터 최신 뉴스",
-    "hero_subtitle": "텐아시아 최신 기사를 한국어·영어로 만나보세요",
-    "latest_articles": "최신 기사",
-    "popular_artists": "인기 아티스트",
-    "view_all": "전체 보기"
+    "hero_title": "K-POP 아이돌 프로필",
+    "hero_subtitle": "기사에서 자동 추출된 K-pop 아이돌·그룹 정보",
+    "latest_articles": "관련 뉴스",
+    "popular_artists": "아이돌 · 그룹",
+    "view_all": "전체 보기",
+    "no_artists_title": "아이돌 데이터 수집 중",
+    "no_artists_desc": "기사를 스크래핑하여 아이돌 프로필을 자동으로 추출하고 있습니다.",
+    "all_idols": "아이돌 전체 보기"
   },
   "article": {
     "read_original": "원문 보기",

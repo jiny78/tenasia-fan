@@ -6,11 +6,14 @@
     "search": "Search"
   },
   "home": {
-    "hero_title": "K-Entertainment News",
-    "hero_subtitle": "Latest TenAsia articles in Korean & English",
-    "latest_articles": "Latest News",
-    "popular_artists": "Popular Artists",
-    "view_all": "View All"
+    "hero_title": "K-POP Idol Profiles",
+    "hero_subtitle": "Auto-extracted idol & group data from K-pop news articles",
+    "latest_articles": "Related News",
+    "popular_artists": "Idols & Groups",
+    "view_all": "View All",
+    "no_artists_title": "Collecting Idol Data",
+    "no_artists_desc": "Idol profiles are being automatically extracted from scraped articles.",
+    "all_idols": "Browse All Idols"
   },
   "article": {
     "read_original": "Read Original",
