@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { groupsApi } from "@/lib/api";
 import { ArticleCard } from "@/components/ArticleCard";
@@ -58,8 +59,21 @@ export default async function GroupDetailPage({
       {/* Profile */}
       <div className="rounded-2xl border border-border bg-card p-6 space-y-6">
         <div className="flex items-start gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-orange-400 text-white text-2xl font-bold">
-            {(name ?? "?").charAt(0)}
+          <div className="relative h-20 w-20 shrink-0 rounded-2xl overflow-hidden">
+            {group.photo_url ? (
+              <Image
+                src={group.photo_url}
+                alt={name ?? ""}
+                fill
+                className="object-cover"
+                sizes="80px"
+                unoptimized
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-pink-500 to-orange-400 text-white text-2xl font-bold">
+                {(name ?? "?").charAt(0)}
+              </div>
+            )}
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">

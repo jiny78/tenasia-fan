@@ -43,6 +43,7 @@ export interface Artist {
   bio_en: string | null;
   is_verified: boolean;
   global_priority: number | null;
+  photo_url?: string | null;
   groups?: ArtistGroup[];
 }
 
@@ -73,6 +74,7 @@ export interface Group {
   bio_en: string | null;
   is_verified: boolean;
   global_priority: number | null;
+  photo_url?: string | null;
   members?: GroupMember[];
 }
 

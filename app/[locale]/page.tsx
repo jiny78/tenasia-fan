@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import Image from "next/image";
 import { artistsApi, groupsApi, articlesApi } from "@/lib/api";
 import { ArtistCard } from "@/components/ArtistCard";
 import { ChevronRight, Users, Sparkles } from "lucide-react";
@@ -77,8 +78,21 @@ export default async function HomePage({
                         href={`/${locale}/groups/${group.id}`}
                         className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-3 hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30 transition-all duration-200 text-center"
                       >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-orange-400 text-white text-sm font-bold">
-                          {(name ?? "?").charAt(0)}
+                        <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0">
+                          {group.photo_url ? (
+                            <Image
+                              src={group.photo_url}
+                              alt={name ?? ""}
+                              fill
+                              className="object-cover"
+                              sizes="48px"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-pink-500 to-orange-400 text-white text-sm font-bold">
+                              {(name ?? "?").charAt(0)}
+                            </div>
+                          )}
                         </div>
                         <p className="truncate text-xs font-semibold group-hover:text-primary transition-colors w-full">
                           {name}

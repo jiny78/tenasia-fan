@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { artistsApi } from "@/lib/api";
 import { ArticleCard } from "@/components/ArticleCard";
@@ -49,8 +50,21 @@ export default async function ArtistDetailPage({
       <div className="rounded-2xl border border-border bg-card p-6 space-y-6">
         <div className="flex items-start gap-4">
           {/* Avatar */}
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white text-2xl font-bold">
-            {(name ?? "?").charAt(0)}
+          <div className="relative h-20 w-20 shrink-0 rounded-2xl overflow-hidden">
+            {artist.photo_url ? (
+              <Image
+                src={artist.photo_url}
+                alt={name ?? ""}
+                fill
+                className="object-cover"
+                sizes="80px"
+                unoptimized
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 text-white text-2xl font-bold">
+                {(name ?? "?").charAt(0)}
+              </div>
+            )}
           </div>
 
           <div className="min-w-0">
