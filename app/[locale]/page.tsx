@@ -121,24 +121,18 @@ export default async function HomePage({
       {/* Latest News (secondary) */}
       {articles.length > 0 && (
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-lg">{t("latest_articles")}</h2>
-            <Link
-              href={`/${locale}/articles`}
-              className="flex items-center gap-1 text-xs text-primary hover:underline"
-            >
-              {t("view_all")} <ChevronRight className="h-3 w-3" />
-            </Link>
-          </div>
+          <h2 className="font-bold text-lg mb-4">{t("latest_articles")}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {articles.map((article) => {
               const title = isKo
                 ? article.title_ko
                 : (article.title_en ?? article.title_ko);
               return (
-                <Link
+                <a
                   key={article.id}
-                  href={`/${locale}/articles/${article.id}`}
+                  href={article.source_url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group rounded-xl border border-border bg-card p-4 hover:border-primary/30 hover:shadow-sm transition-all duration-200"
                 >
                   <p className="text-xs text-muted-foreground mb-1.5">
@@ -159,7 +153,7 @@ export default async function HomePage({
                   <p className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
                     {title}
                   </p>
-                </Link>
+                </a>
               );
             })}
           </div>

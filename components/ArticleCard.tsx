@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ko, enUS } from "date-fns/locale";
 import type { Article } from "@/lib/types";
@@ -23,8 +22,10 @@ export function ArticleCard({ article, locale }: ArticleCardProps) {
       })
     : null;
 
+  const href = article.source_url || "#";
+
   return (
-    <Link href={`/${locale}/articles/${article.id}`} className="group block">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
       <div className="overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10">
         {/* Thumbnail */}
         {article.thumbnail_url && (
@@ -77,6 +78,6 @@ export function ArticleCard({ article, locale }: ArticleCardProps) {
           </div>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }
