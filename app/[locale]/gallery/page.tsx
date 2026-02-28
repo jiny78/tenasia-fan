@@ -14,27 +14,35 @@ export default async function GalleryPage({
     .list({ limit: 100, has_thumbnail: true })
     .catch(() => []);
 
-  // 아티스트별 그룹화
+  // 아티스트별 그룹화 — 아티스트명 없는 항목(기타) 제외, 중복 썸네일 제거
   const artistMap = new Map<string, { name: string; photos: Article[] }>();
 
   for (const article of articles) {
     if (!article.thumbnail_url) continue;
-    const artistKey =
-      (isKo
-        ? article.artist_name_ko
-        : (article.artist_name_en ?? article.artist_name_ko)) ?? "기타";
-    if (!artistMap.has(artistKey)) {
-      artistMap.set(artistKey, { name: artistKey, photos: [] });
+
+    const artistName = isKo
+      ? article.artist_name_ko
+      : (article.artist_name_en ?? article.artist_name_ko);
+
+    // 아티스트명 없으면 건너뜀 (기타 카테고리 제거)
+    if (!artistName) continue;
+
+    if (!artistMap.has(artistName)) {
+      artistMap.set(artistName, { name: artistName, photos: [] });
     }
-    artistMap.get(artistKey)!.photos.push(article);
+
+    const group = artistMap.get(artistName)!;
+
+    // 중복 썸네일 제거
+    if (!group.photos.some((p) => p.thumbnail_url === article.thumbnail_url)) {
+      group.photos.push(article);
+    }
   }
 
-  // 사진 많은 아티스트 순 정렬
+  // 사진 많은 순 정렬
   const artistGroups = Array.from(artistMap.values()).sort(
     (a, b) => b.photos.length - a.photos.length
   );
 
-  return (
-    <GalleryClient artistGroups={artistGroups} locale={locale} />
-  );
+  return <GalleryClient artistGroups={artistGroups} locale={locale} />;
 }
