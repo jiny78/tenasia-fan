@@ -19,6 +19,12 @@ function isFemale(gender: string | null) {
   return g === "FEMALE" || g === "F" || g === "여성" || g === "여";
 }
 
+function isMixed(gender: string | null) {
+  if (!gender) return false;
+  const g = gender.toUpperCase();
+  return g === "MIXED" || g === "혼성";
+}
+
 interface GroupCardProps {
   group: Group;
   locale: string;
@@ -68,13 +74,17 @@ function GroupCard({ group, locale, isKo }: GroupCardProps) {
 
 // ────────────────────────────────────────────────────────────────────────────
 
-type FilterKey = "all" | "male" | "female" | "groups";
+type FilterKey = "all" | "boy_group" | "girl_group" | "mixed_group" | "male_solo" | "female_solo";
 
-const MAIN_FILTERS: { key: FilterKey; label: string }[] = [
-  { key: "all",    label: "전체" },
-  { key: "male",   label: "남자아이돌" },
-  { key: "female", label: "여자아이돌" },
-  { key: "groups", label: "그룹별" },
+const GROUP_FILTERS: { key: FilterKey; label: string }[] = [
+  { key: "boy_group",   label: "보이그룹" },
+  { key: "girl_group",  label: "걸그룹" },
+  { key: "mixed_group", label: "혼성 그룹" },
+];
+
+const SOLO_FILTERS: { key: FilterKey; label: string }[] = [
+  { key: "male_solo",   label: "남자아이돌" },
+  { key: "female_solo", label: "여자아이돌" },
 ];
 
 export function ArtistsClient({
@@ -88,45 +98,33 @@ export function ArtistsClient({
   locale: string;
   isKo: boolean;
 }) {
-  const [filter, setFilter] = useState<FilterKey | string>("all");
-
-  // Unique labels sorted by number of groups (largest first)
-  const labels = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const g of groups) {
-      if (g.label_ko) counts[g.label_ko] = (counts[g.label_ko] ?? 0) + 1;
-    }
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([label]) => label);
-  }, [groups]);
-
-  const isLabelFilter = filter.startsWith("label:");
+  const [filter, setFilter] = useState<FilterKey>("all");
 
   const filteredGroups = useMemo(() => {
-    if (isLabelFilter) return groups.filter((g) => g.label_ko === filter.slice(6));
-    if (filter === "male")   return groups.filter((g) => isMale(g.gender));
-    if (filter === "female") return groups.filter((g) => isFemale(g.gender));
-    return groups; // "all" | "groups"
-  }, [groups, filter, isLabelFilter]);
+    if (filter === "boy_group")   return groups.filter((g) => isMale(g.gender));
+    if (filter === "girl_group")  return groups.filter((g) => isFemale(g.gender));
+    if (filter === "mixed_group") return groups.filter((g) => isMixed(g.gender));
+    if (filter === "male_solo" || filter === "female_solo") return [];
+    return groups; // "all"
+  }, [groups, filter]);
 
-  // Solo artists are hidden in "groups-only" or label-specific views
   const filteredArtists = useMemo(() => {
-    if (filter === "groups" || isLabelFilter) return [];
-    if (filter === "male")   return artists.filter((a) => isMale(a.gender));
-    if (filter === "female") return artists.filter((a) => isFemale(a.gender));
-    return artists;
-  }, [artists, filter, isLabelFilter]);
+    if (filter === "boy_group" || filter === "girl_group" || filter === "mixed_group") return [];
+    if (filter === "male_solo")   return artists.filter((a) => isMale(a.gender));
+    if (filter === "female_solo") return artists.filter((a) => isFemale(a.gender));
+    return artists; // "all"
+  }, [artists, filter]);
 
-  // Count helpers for badge numbers
   const counts = useMemo(() => ({
-    all:    groups.length + artists.length,
-    male:   groups.filter((g) => isMale(g.gender)).length   + artists.filter((a) => isMale(a.gender)).length,
-    female: groups.filter((g) => isFemale(g.gender)).length + artists.filter((a) => isFemale(a.gender)).length,
-    groups: groups.length,
+    all:         groups.length + artists.length,
+    boy_group:   groups.filter((g) => isMale(g.gender)).length,
+    girl_group:  groups.filter((g) => isFemale(g.gender)).length,
+    mixed_group: groups.filter((g) => isMixed(g.gender)).length,
+    male_solo:   artists.filter((a) => isMale(a.gender)).length,
+    female_solo: artists.filter((a) => isFemale(a.gender)).length,
   }), [groups, artists]);
 
-  function NavItem({ k, label, count }: { k: string; label: string; count: number }) {
+  function NavItem({ k, label, count }: { k: FilterKey; label: string; count: number }) {
     const active = filter === k;
     return (
       <button
@@ -145,12 +143,18 @@ export function ArtistsClient({
     );
   }
 
+  const allFilters: { key: FilterKey; label: string }[] = [
+    { key: "all", label: "전체" },
+    ...GROUP_FILTERS,
+    ...SOLO_FILTERS,
+  ];
+
   return (
     <div className="flex flex-col gap-4 md:flex-row md:gap-8">
 
       {/* ── Mobile: horizontal pill tabs ── */}
       <div className="flex md:hidden gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {MAIN_FILTERS.map(({ key, label }) => (
+        {allFilters.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
@@ -164,58 +168,34 @@ export function ArtistsClient({
             <span className="opacity-70 tabular-nums">{counts[key]}</span>
           </button>
         ))}
-        {labels.map((label) => (
-          <button
-            key={label}
-            onClick={() => setFilter(`label:${label}`)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              filter === `label:${label}`
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
       </div>
 
       {/* ── Desktop: sidebar ── */}
       <aside className="hidden md:block w-44 shrink-0">
         <nav className="sticky top-20 space-y-0.5">
-          {MAIN_FILTERS.map(({ key, label }) => (
-            <NavItem key={key} k={key} label={label} count={counts[key as FilterKey]} />
-          ))}
+          <NavItem k="all" label="전체" count={counts.all} />
 
-          {labels.length > 0 && (
-            <div className="pt-5">
-              <p className="px-3 pb-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                소속사별
-              </p>
-              <div className="space-y-0.5">
-                {labels.map((label) => {
-                  const k = `label:${label}`;
-                  const cnt = groups.filter((g) => g.label_ko === label).length;
-                  const active = filter === k;
-                  return (
-                    <button
-                      key={label}
-                      onClick={() => setFilter(k)}
-                      className={`w-full text-left flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors ${
-                        active
-                          ? "bg-primary/10 text-primary font-semibold"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      }`}
-                    >
-                      <span className="truncate">{label}</span>
-                      <span className={`shrink-0 ml-1 rounded-full px-1.5 py-0.5 tabular-nums ${active ? "bg-primary/20" : "bg-muted"}`}>
-                        {cnt}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+          <div className="pt-4">
+            <p className="px-3 pb-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+              그룹
+            </p>
+            <div className="space-y-0.5">
+              {GROUP_FILTERS.map(({ key, label }) => (
+                <NavItem key={key} k={key} label={label} count={counts[key]} />
+              ))}
             </div>
-          )}
+          </div>
+
+          <div className="pt-4">
+            <p className="px-3 pb-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+              개별
+            </p>
+            <div className="space-y-0.5">
+              {SOLO_FILTERS.map(({ key, label }) => (
+                <NavItem key={key} k={key} label={label} count={counts[key]} />
+              ))}
+            </div>
+          </div>
         </nav>
       </aside>
 

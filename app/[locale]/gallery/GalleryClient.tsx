@@ -1,15 +1,28 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight, ExternalLink, ArrowLeft, BadgeCheck } from "lucide-react";
 import type { Article, Artist, Group } from "@/lib/types";
 import { artistsApi, groupsApi } from "@/lib/api";
 
+type ArtistCategory = "boy_group" | "girl_group" | "mixed_group" | "male_solo" | "female_solo" | "unknown";
+type CategoryFilter = "all" | ArtistCategory;
+
 interface ArtistGroup {
   name: string;
   photos: Article[];
+  category: ArtistCategory;
 }
+
+const CATEGORY_FILTERS: { key: CategoryFilter; label: string }[] = [
+  { key: "all",         label: "전체" },
+  { key: "boy_group",   label: "보이그룹" },
+  { key: "girl_group",  label: "걸그룹" },
+  { key: "mixed_group", label: "혼성 그룹" },
+  { key: "male_solo",   label: "남자아이돌" },
+  { key: "female_solo", label: "여자아이돌" },
+];
 
 interface Props {
   artistGroups: ArtistGroup[];
@@ -20,6 +33,24 @@ type Profile = { type: "artist"; data: Artist } | { type: "group"; data: Group }
 
 export function GalleryClient({ artistGroups, locale }: Props) {
   const isKo = locale === "ko";
+
+  // 카테고리 필터
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+
+  const filteredArtistGroups = useMemo(() => {
+    if (categoryFilter === "all" || categoryFilter === "unknown") return artistGroups;
+    return artistGroups.filter((g) => g.category === categoryFilter);
+  }, [artistGroups, categoryFilter]);
+
+  const counts = useMemo(() => {
+    const c: Record<CategoryFilter, number> = {
+      all: artistGroups.length,
+      boy_group:   0, girl_group:  0, mixed_group: 0,
+      male_solo:   0, female_solo: 0, unknown:     0,
+    };
+    for (const g of artistGroups) c[g.category]++;
+    return c;
+  }, [artistGroups]);
 
   // 선택된 아티스트 (null = 목록 뷰)
   const [selectedArtist, setSelectedArtist] = useState<ArtistGroup | null>(null);
@@ -100,7 +131,7 @@ export function GalleryClient({ artistGroups, locale }: Props) {
     setSelectedArtist(null);
   };
 
-  const totalPhotos = artistGroups.reduce((s, g) => s + g.photos.length, 0);
+  const totalPhotos = filteredArtistGroups.reduce((s, g) => s + g.photos.length, 0);
 
   // ── 뷰 1: 아티스트 목록 ─────────────────────────────────────
   if (!selectedArtist) {
@@ -109,11 +140,33 @@ export function GalleryClient({ artistGroups, locale }: Props) {
         <div className="flex items-center justify-between">
           <h1 className="font-bold text-2xl">{isKo ? "갤러리" : "Gallery"}</h1>
           <span className="text-xs text-muted-foreground bg-muted rounded-full px-2.5 py-0.5">
-            {artistGroups.length}{isKo ? "명" : " artists"} · {totalPhotos}{isKo ? "장" : " photos"}
+            {filteredArtistGroups.length}{isKo ? "명" : " artists"} · {totalPhotos}{isKo ? "장" : " photos"}
           </span>
         </div>
 
-        {artistGroups.length === 0 ? (
+        {/* 카테고리 필터 pills */}
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          {CATEGORY_FILTERS.map(({ key, label }) => {
+            const cnt = counts[key];
+            if (key !== "all" && cnt === 0) return null;
+            return (
+              <button
+                key={key}
+                onClick={() => setCategoryFilter(key)}
+                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  categoryFilter === key
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {label}
+                <span className="opacity-70 tabular-nums">{cnt}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {filteredArtistGroups.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-card/50 px-8 py-20 text-center">
             <p className="text-muted-foreground text-sm">
               {isKo ? "사진이 없습니다." : "No photos yet."}
@@ -121,7 +174,7 @@ export function GalleryClient({ artistGroups, locale }: Props) {
           </div>
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-4">
-            {artistGroups.map((group) => {
+            {filteredArtistGroups.map((group) => {
               const coverPhoto = group.photos[0];
               return (
                 <button

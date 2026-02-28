@@ -69,7 +69,7 @@ export const artistsApi = {
 // ── Groups ──────────────────────────────────────────────────
 
 export const groupsApi = {
-  list: (params?: { q?: string; limit?: number }) =>
+  list: (params?: { q?: string; limit?: number; offset?: number }) =>
     get<Group[]>(`/public/groups${qs({ limit: 50, ...params })}`),
 
   get: (id: number) => get<Group>(`/public/groups/${id}`),
