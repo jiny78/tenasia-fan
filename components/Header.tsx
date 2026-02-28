@@ -35,6 +35,7 @@ export function Header({ locale }: HeaderProps) {
   const navLinks = [
     { href: `/${locale}`, label: t("home") },
     { href: `/${locale}/artists`, label: t("artists") },
+    { href: `/${locale}/gallery`, label: t("gallery") },
   ];
 
   return (

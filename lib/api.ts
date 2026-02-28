@@ -45,6 +45,7 @@ export const articlesApi = {
     group_id?: number;
     language?: string;
     q?: string;
+    has_thumbnail?: boolean;
   }) =>
     get<Article[]>(
       `/public/articles${qs({ limit: 20, ...params })}`
@@ -82,4 +83,74 @@ export const groupsApi = {
 export const searchApi = {
   search: (q: string, limit = 20) =>
     get<SearchResult>(`/public/search${qs({ q, limit })}`),
+};
+
+// ── Admin ────────────────────────────────────────────────────
+
+export interface EntityMappingItem {
+  id: number;
+  article_id: number;
+  article_title_ko: string | null;
+  article_url: string | null;
+  entity_type: string | null;
+  artist_id: number | null;
+  artist_name_ko: string | null;
+  group_id: number | null;
+  group_name_ko: string | null;
+  confidence_score: number | null;
+}
+
+async function patch<T>(path: string, body: Record<string, unknown>): Promise<T> {
+  const url = `${base()}${path}`;
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`${res.status} ${res.statusText}: ${text}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+async function del<T>(path: string): Promise<T> {
+  const url = `${base()}${path}`;
+  const res = await fetch(url, { method: "DELETE" });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`${res.status} ${res.statusText}: ${text}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+async function post<T>(path: string, body: Record<string, unknown>): Promise<T> {
+  const url = `${base()}${path}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`${res.status} ${res.statusText}: ${text}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+export const adminApi = {
+  updateGroup: (id: number, data: { activity_status?: string; bio_ko?: string; bio_en?: string }) =>
+    patch<Group>(`/public/groups/${id}`, data),
+
+  updateArtist: (id: number, data: { bio_ko?: string; bio_en?: string }) =>
+    patch<Artist>(`/public/artists/${id}`, data),
+
+  listMappings: (params?: { article_id?: number; artist_id?: number; group_id?: number }) =>
+    get<EntityMappingItem[]>(`/public/entity-mappings${qs({ ...params })}`),
+
+  deleteMapping: (id: number) =>
+    del<{ deleted: number }>(`/public/entity-mappings/${id}`),
+
+  createMapping: (data: { article_id: number; artist_id?: number; group_id?: number; confidence_score?: number }) =>
+    post<{ created: number }>(`/public/entity-mappings`, data),
 };
