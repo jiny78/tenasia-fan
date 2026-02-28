@@ -27,9 +27,6 @@ export default async function LocaleLayout({
       </main>
       <footer className="border-t border-border/60 mt-16 py-8 text-center text-xs text-muted-foreground">
         <p>© {new Date().getFullYear()} TenAsia Fan · Powered by TenAsia Intelligence Hub</p>
-        <p className="mt-2">
-          <a href={`/${locale}/admin`} className="hover:text-foreground transition-colors">관리자</a>
-        </p>
       </footer>
     </NextIntlClientProvider>
   );
