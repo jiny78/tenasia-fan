@@ -57,7 +57,7 @@ export const articlesApi = {
 // ── Artists ─────────────────────────────────────────────────
 
 export const artistsApi = {
-  list: (params?: { q?: string; limit?: number; global_priority?: number }) =>
+  list: (params?: { q?: string; limit?: number; offset?: number; global_priority?: number }) =>
     get<Artist[]>(`/public/artists${qs({ limit: 50, ...params })}`),
 
   get: (id: number) => get<Artist>(`/public/artists/${id}`),

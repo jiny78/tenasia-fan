@@ -22,15 +22,17 @@ export default async function GalleryPage({
   const { locale } = await params;
   const isKo = locale === "ko";
 
-  // 3페이지 병렬 fetch로 최대 300개 기사 + artists/groups 카테고리 정보
-  const [p0, p1, p2, allArtists, allGroups] = await Promise.all([
+  // 3페이지 기사 + 전체 아티스트(2페이지) + 그룹 병렬 fetch
+  const [p0, p1, p2, a0, a1, allGroups] = await Promise.all([
     articlesApi.list({ limit: 100, has_thumbnail: true, offset: 0 }).catch(() => [] as Article[]),
     articlesApi.list({ limit: 100, has_thumbnail: true, offset: 100 }).catch(() => [] as Article[]),
     articlesApi.list({ limit: 100, has_thumbnail: true, offset: 200 }).catch(() => [] as Article[]),
-    artistsApi.list({ limit: 200 }).catch(() => []),
+    artistsApi.list({ limit: 200, offset: 0 }).catch(() => []),
+    artistsApi.list({ limit: 200, offset: 200 }).catch(() => []),
     groupsApi.list({ limit: 200 }).catch(() => []),
   ]);
   const articles = [...p0, ...p1, ...p2];
+  const allArtists = [...a0, ...a1];
 
   // 이름→gender 룩업맵 (name_ko + stage_name_ko 모두 등록)
   const artistGenderMap = new Map<string, string | null>();
