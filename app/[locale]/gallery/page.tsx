@@ -20,9 +20,15 @@ export default async function GalleryPage({
   const { locale } = await params;
   const isKo = locale === "ko";
 
-  const articles = await articlesApi
-    .list({ limit: 100, has_thumbnail: true })
-    .catch(() => []);
+  // 3페이지 병렬 fetch로 최대 300개 기사에서 아티스트 사진 수집
+  const pages = await Promise.all(
+    [0, 100, 200].map((offset) =>
+      articlesApi
+        .list({ limit: 100, has_thumbnail: true, offset })
+        .catch(() => [] as Article[])
+    )
+  );
+  const articles = pages.flat();
 
   // 아티스트별 그룹화 — 아티스트명 없는 항목(기타) 제외, 중복 썸네일 제거
   const artistMap = new Map<string, { name: string; photos: Article[]; seenUrls: Set<string> }>();
