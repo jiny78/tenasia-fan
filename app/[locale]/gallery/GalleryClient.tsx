@@ -367,18 +367,10 @@ function GroupProfileCard({ group, locale }: { group: Group; locale: string }) {
   const fandom = isKo ? group.fandom_name_ko : (group.fandom_name_en ?? group.fandom_name_ko);
   const label  = isKo ? group.label_ko : (group.label_en ?? group.label_ko);
 
-  const STATUS_LABEL: Record<string, string> = {
-    ACTIVE:    isKo ? "활동 중"  : "Active",
-    HIATUS:    isKo ? "활동 중단" : "Hiatus",
-    DISBANDED: isKo ? "해체"     : "Disbanded",
-    SOLO_ONLY: isKo ? "솔로 활동" : "Solo",
-  };
-
   const fields: { label: string; value: string | null | undefined }[] = [
-    { label: isKo ? "데뷔" : "Debut",          value: group.debut_date },
-    { label: isKo ? "소속사" : "Label",        value: label },
-    { label: isKo ? "팬덤" : "Fandom",         value: fandom },
-    { label: isKo ? "상태" : "Status",         value: group.activity_status ? STATUS_LABEL[group.activity_status] : null },
+    { label: isKo ? "데뷔" : "Debut",   value: group.debut_date },
+    { label: isKo ? "소속사" : "Label", value: label },
+    { label: isKo ? "팬덤" : "Fandom",  value: fandom },
   ].filter((f) => f.value);
 
   return (

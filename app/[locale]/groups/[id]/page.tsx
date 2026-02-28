@@ -6,13 +6,6 @@ import { groupsApi } from "@/lib/api";
 import { ArticleCard } from "@/components/ArticleCard";
 import { BadgeCheck, ChevronLeft } from "lucide-react";
 
-const STATUS_MAP: Record<string, "active" | "hiatus" | "disbanded" | "solo_only"> = {
-  ACTIVE: "active",
-  HIATUS: "hiatus",
-  DISBANDED: "disbanded",
-  SOLO_ONLY: "solo_only",
-};
-
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
@@ -43,9 +36,6 @@ export default async function GroupDetailPage({
   const label = isKo ? group.label_ko : (group.label_en ?? group.label_ko);
   const fandom = isKo ? group.fandom_name_ko : (group.fandom_name_en ?? group.fandom_name_ko);
   const bio = isKo ? group.bio_ko : (group.bio_en ?? group.bio_ko);
-  const statusKey = group.activity_status ? STATUS_MAP[group.activity_status] : null;
-  const statusLabel = statusKey ? t(statusKey) : group.activity_status;
-
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Back */}
@@ -91,7 +81,6 @@ export default async function GroupDetailPage({
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <InfoRow label={t("debut")} value={group.debut_date} />
           <InfoRow label={t("label")} value={label} />
-          <InfoRow label={t("status")} value={statusLabel} />
         </div>
 
         {bio && (
