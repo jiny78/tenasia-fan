@@ -32,9 +32,17 @@ export default async function GalleryPage({
   ]);
   const articles = [...p0, ...p1, ...p2];
 
-  // 이름→gender 룩업맵
-  const artistGenderMap = new Map(allArtists.map((a) => [a.name_ko, a.gender]));
-  const groupGenderMap  = new Map(allGroups.map((g) => [g.name_ko, g.gender]));
+  // 이름→gender 룩업맵 (name_ko + stage_name_ko 모두 등록)
+  const artistGenderMap = new Map<string, string | null>();
+  for (const a of allArtists) {
+    if (a.name_ko) artistGenderMap.set(a.name_ko, a.gender);
+    if (a.stage_name_ko) artistGenderMap.set(a.stage_name_ko, a.gender);
+  }
+  const groupGenderMap = new Map<string, string | null>();
+  for (const g of allGroups) {
+    if (g.name_ko) groupGenderMap.set(g.name_ko, g.gender);
+    if (g.name_en) groupGenderMap.set(g.name_en, g.gender);
+  }
 
   function resolveCategory(name: string): ArtistCategory {
     const gg = groupGenderMap.get(name)?.toUpperCase();

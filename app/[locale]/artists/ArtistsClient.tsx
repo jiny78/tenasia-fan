@@ -98,22 +98,37 @@ export function ArtistsClient({
   locale: string;
   isKo: boolean;
 }) {
-  const [filter, setFilter] = useState<FilterKey>("all");
+  const [filter, setFilter] = useState<FilterKey | string>("all");
+
+  // 소속사별 레이블 (그룹 수 많은 순)
+  const labels = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const g of groups) {
+      if (g.label_ko) counts[g.label_ko] = (counts[g.label_ko] ?? 0) + 1;
+    }
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([label]) => label);
+  }, [groups]);
+
+  const isLabelFilter = typeof filter === "string" && filter.startsWith("label:");
 
   const filteredGroups = useMemo(() => {
+    if (isLabelFilter) return groups.filter((g) => g.label_ko === filter.slice(6));
     if (filter === "boy_group")   return groups.filter((g) => isMale(g.gender));
     if (filter === "girl_group")  return groups.filter((g) => isFemale(g.gender));
     if (filter === "mixed_group") return groups.filter((g) => isMixed(g.gender));
     if (filter === "male_solo" || filter === "female_solo") return [];
     return groups; // "all"
-  }, [groups, filter]);
+  }, [groups, filter, isLabelFilter]);
 
   const filteredArtists = useMemo(() => {
+    if (isLabelFilter) return [];
     if (filter === "boy_group" || filter === "girl_group" || filter === "mixed_group") return [];
     if (filter === "male_solo")   return artists.filter((a) => isMale(a.gender));
     if (filter === "female_solo") return artists.filter((a) => isFemale(a.gender));
     return artists; // "all"
-  }, [artists, filter]);
+  }, [artists, filter, isLabelFilter]);
 
   const counts = useMemo(() => ({
     all:         groups.length + artists.length,
@@ -124,7 +139,7 @@ export function ArtistsClient({
     female_solo: artists.filter((a) => isFemale(a.gender)).length,
   }), [groups, artists]);
 
-  function NavItem({ k, label, count }: { k: FilterKey; label: string; count: number }) {
+  function NavItem({ k, label, count }: { k: string; label: string; count: number }) {
     const active = filter === k;
     return (
       <button
@@ -165,7 +180,20 @@ export function ArtistsClient({
             }`}
           >
             {label}
-            <span className="opacity-70 tabular-nums">{counts[key]}</span>
+            <span className="opacity-70 tabular-nums">{counts[key as FilterKey]}</span>
+          </button>
+        ))}
+        {labels.map((label) => (
+          <button
+            key={label}
+            onClick={() => setFilter(`label:${label}`)}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              filter === `label:${label}`
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {label}
           </button>
         ))}
       </div>
@@ -196,6 +224,37 @@ export function ArtistsClient({
               ))}
             </div>
           </div>
+
+          {labels.length > 0 && (
+            <div className="pt-4">
+              <p className="px-3 pb-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                소속사별
+              </p>
+              <div className="space-y-0.5">
+                {labels.map((label) => {
+                  const k = `label:${label}`;
+                  const cnt = groups.filter((g) => g.label_ko === label).length;
+                  const active = filter === k;
+                  return (
+                    <button
+                      key={label}
+                      onClick={() => setFilter(k)}
+                      className={`w-full text-left flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors ${
+                        active
+                          ? "bg-primary/10 text-primary font-semibold"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      <span className="truncate">{label}</span>
+                      <span className={`shrink-0 ml-1 rounded-full px-1.5 py-0.5 tabular-nums ${active ? "bg-primary/20" : "bg-muted"}`}>
+                        {cnt}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </nav>
       </aside>
 
