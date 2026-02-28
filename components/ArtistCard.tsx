@@ -17,32 +17,33 @@ export function ArtistCard({ artist, locale }: ArtistCardProps) {
 
   return (
     <Link href={`/${locale}/artists/${artist.id}`} className="group block">
-      <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/10 hover:border-primary/30 text-center">
-        {/* Avatar */}
-        <div className="relative h-16 w-16 shrink-0 rounded-full overflow-hidden">
+      <div className="rounded-xl overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10 hover:border-primary/30">
+        {/* Square photo */}
+        <div className="relative aspect-square w-full bg-muted overflow-hidden">
           {artist.photo_url ? (
             <Image
               src={artist.photo_url}
               alt={name ?? ""}
               fill
-              className="object-cover"
-              sizes="64px"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
               unoptimized
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xl font-bold">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 text-white text-4xl font-bold">
               {(name ?? "?").charAt(0)}
             </div>
           )}
         </div>
 
-        <div className="min-w-0 w-full">
-          <div className="flex items-center justify-center gap-1">
-            <p className="truncate font-semibold text-xs group-hover:text-primary transition-colors">
+        {/* Info below */}
+        <div className="px-3 py-2.5 space-y-0.5">
+          <div className="flex items-center gap-1">
+            <p className="truncate font-semibold text-sm leading-tight group-hover:text-primary transition-colors">
               {name}
             </p>
             {artist.is_verified && (
-              <BadgeCheck className="h-3 w-3 shrink-0 text-blue-400" />
+              <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-blue-400" />
             )}
           </div>
           {stageName && stageName !== name && (

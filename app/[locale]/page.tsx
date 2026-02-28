@@ -67,7 +67,7 @@ export default async function HomePage({
                 <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                   {isKo ? "그룹" : "Groups"}
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
                   {groups.map((group) => {
                     const name = isKo
                       ? group.name_ko
@@ -76,27 +76,31 @@ export default async function HomePage({
                       <Link
                         key={group.id}
                         href={`/${locale}/groups/${group.id}`}
-                        className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-3 hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30 transition-all duration-200 text-center"
+                        className="group block"
                       >
-                        <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0">
-                          {group.photo_url ? (
-                            <Image
-                              src={group.photo_url}
-                              alt={name ?? ""}
-                              fill
-                              className="object-cover"
-                              sizes="48px"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-pink-500 to-orange-400 text-white text-sm font-bold">
-                              {(name ?? "?").charAt(0)}
-                            </div>
-                          )}
+                        <div className="rounded-xl overflow-hidden border border-border bg-card transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-primary/30">
+                          <div className="relative aspect-square w-full bg-muted overflow-hidden">
+                            {group.photo_url ? (
+                              <Image
+                                src={group.photo_url}
+                                alt={name ?? ""}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                sizes="(max-width: 640px) 33vw, 16vw"
+                                unoptimized
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-pink-500 to-orange-400 text-white text-3xl font-bold">
+                                {(name ?? "?").charAt(0)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="px-2 py-1.5">
+                            <p className="truncate text-xs font-semibold group-hover:text-primary transition-colors">
+                              {name}
+                            </p>
+                          </div>
                         </div>
-                        <p className="truncate text-xs font-semibold group-hover:text-primary transition-colors w-full">
-                          {name}
-                        </p>
                       </Link>
                     );
                   })}

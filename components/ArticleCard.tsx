@@ -57,19 +57,28 @@ export function ArticleCard({ article, locale }: ArticleCardProps) {
             <p className="text-xs text-muted-foreground line-clamp-2">{summary}</p>
           )}
 
-          {/* Tags */}
-          {tags && tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {tags.slice(0, 3).map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Tags + Sentiment */}
+          <div className="flex flex-wrap gap-1 items-center">
+            {article.sentiment && (
+              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold shrink-0 ${
+                article.sentiment === "POSITIVE"
+                  ? "bg-emerald-500/15 text-emerald-500"
+                  : article.sentiment === "NEGATIVE"
+                  ? "bg-rose-500/15 text-rose-400"
+                  : "bg-muted text-muted-foreground"
+              }`}>
+                {article.sentiment === "POSITIVE" ? "긍정" : article.sentiment === "NEGATIVE" ? "부정" : "중립"}
+              </span>
+            )}
+            {tags && tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
 
           {/* Footer */}
           <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-1 border-t border-border/50">

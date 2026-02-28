@@ -14,6 +14,7 @@ export interface Article {
   thumbnail_url: string | null;
   source_url: string | null;
   language: string | null;
+  sentiment?: string | null;
 }
 
 export interface ArtistGroup {
