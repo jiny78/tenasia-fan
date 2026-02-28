@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import Image from "next/image";
 import { artistsApi, groupsApi, articlesApi } from "@/lib/api";
 import { ChevronRight, Users, Sparkles } from "lucide-react";
+import { IdolCarousel, type IdolItem } from "@/components/IdolCarousel";
 
 export default async function HomePage({
   params,
@@ -14,12 +14,28 @@ export default async function HomePage({
   const isKo = locale === "ko";
 
   const [artists, groups, articles] = await Promise.all([
-    artistsApi.list({ limit: 18 }).catch(() => []),
-    groupsApi.list({ limit: 12 }).catch(() => []),
+    artistsApi.list({ limit: 200 }).catch(() => []),
+    groupsApi.list({ limit: 200 }).catch(() => []),
     articlesApi.list({ limit: 6 }).catch(() => []),
   ]);
 
-  const hasIdols = artists.length > 0 || groups.length > 0;
+  // 그룹 + 아티스트를 하나의 pool로 합쳐서 IdolCarousel에 전달
+  const idolPool: IdolItem[] = [
+    ...groups.map((g) => ({
+      id: g.id,
+      name: isKo ? g.name_ko : (g.name_en ?? g.name_ko),
+      photo_url: g.photo_url,
+      type: "group" as const,
+      href: `/${locale}/groups/${g.id}`,
+    })),
+    ...artists.map((a) => ({
+      id: a.id,
+      name: isKo ? a.name_ko : (a.name_en ?? a.name_ko),
+      photo_url: a.photo_url,
+      type: "artist" as const,
+      href: `/${locale}/artists/${a.id}`,
+    })),
+  ];
 
   return (
     <div className="space-y-12">
@@ -46,7 +62,7 @@ export default async function HomePage({
         </div>
       </section>
 
-      {/* Idols & Groups */}
+      {/* Idols & Groups — 랜덤 순환 캐러셀 */}
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-lg">{t("popular_artists")}</h2>
@@ -58,94 +74,8 @@ export default async function HomePage({
           </Link>
         </div>
 
-        {hasIdols ? (
-          <div className="space-y-6">
-            {/* Groups */}
-            {groups.length > 0 && (
-              <div>
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  {isKo ? "그룹" : "Groups"}
-                </h3>
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
-                  {groups.map((group) => {
-                    const name = isKo
-                      ? group.name_ko
-                      : (group.name_en ?? group.name_ko);
-                    return (
-                      <Link
-                        key={group.id}
-                        href={`/${locale}/groups/${group.id}`}
-                        className="group flex flex-col items-center gap-1.5"
-                      >
-                        <div className="relative w-full aspect-square rounded-full overflow-hidden bg-muted ring-2 ring-transparent group-hover:ring-primary/50 transition-all duration-200">
-                          {group.photo_url ? (
-                            <Image
-                              src={group.photo_url}
-                              alt={name ?? ""}
-                              fill
-                              className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                              sizes="(max-width: 640px) 25vw, 10vw"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-pink-500 to-orange-400 text-white text-lg font-bold">
-                              {(name ?? "?").charAt(0)}
-                            </div>
-                          )}
-                        </div>
-                        <p className="truncate text-[10px] font-medium text-center w-full group-hover:text-primary transition-colors">
-                          {name}
-                        </p>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Solo Artists */}
-            {artists.length > 0 && (
-              <div>
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  {isKo ? "솔로" : "Solo"}
-                </h3>
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
-                  {artists.map((artist) => {
-                    const name = isKo
-                      ? artist.name_ko
-                      : (artist.name_en ?? artist.name_ko);
-                    return (
-                      <Link
-                        key={artist.id}
-                        href={`/${locale}/artists/${artist.id}`}
-                        className="group flex flex-col items-center gap-1.5"
-                      >
-                        <div className="relative w-full aspect-square rounded-full overflow-hidden bg-muted ring-2 ring-transparent group-hover:ring-primary/50 transition-all duration-200">
-                          {artist.photo_url ? (
-                            <Image
-                              src={artist.photo_url}
-                              alt={name ?? ""}
-                              fill
-                              className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                              sizes="(max-width: 640px) 25vw, 10vw"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 text-white text-lg font-bold">
-                              {(name ?? "?").charAt(0)}
-                            </div>
-                          )}
-                        </div>
-                        <p className="truncate text-[10px] font-medium text-center w-full group-hover:text-primary transition-colors">
-                          {name}
-                        </p>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
+        {idolPool.length > 0 ? (
+          <IdolCarousel items={idolPool} />
         ) : (
           /* Empty state */
           <div className="rounded-xl border border-dashed border-border bg-card/50 px-8 py-12 text-center">
