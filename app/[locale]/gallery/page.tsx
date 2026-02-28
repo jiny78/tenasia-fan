@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { articlesApi } from "@/lib/api";
+import type { Article } from "@/lib/types";
 
 export default async function GalleryPage({
   params,
@@ -16,10 +17,7 @@ export default async function GalleryPage({
     .catch(() => []);
 
   // 아티스트별 그룹화
-  const artistMap = new Map<
-    string,
-    { name: string; photos: typeof articles }
-  >();
+  const artistMap = new Map<string, { name: string; photos: Article[] }>();
 
   for (const article of articles) {
     if (!article.thumbnail_url) continue;
