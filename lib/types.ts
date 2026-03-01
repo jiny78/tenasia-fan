@@ -15,6 +15,16 @@ export interface Article {
   source_url: string | null;
   language: string | null;
   sentiment?: string | null;
+  extra_images?: { url: string }[];
+}
+
+/** 갤러리 사진 단위 (기사 1개에서 여러 장 추출 가능) */
+export interface Photo {
+  url: string;
+  article_id: number;
+  title_ko: string | null;
+  title_en: string | null;
+  source_url: string | null;
 }
 
 export interface ArtistGroup {

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight, ExternalLink, ArrowLeft, BadgeCheck } from "lucide-react";
-import type { Article, Artist, Group } from "@/lib/types";
+import type { Photo, Artist, Group } from "@/lib/types";
 import { artistsApi, groupsApi } from "@/lib/api";
 
 type ArtistCategory = "boy_group" | "girl_group" | "mixed_group" | "male_solo" | "female_solo" | "unknown";
@@ -11,7 +11,7 @@ type CategoryFilter = "all" | ArtistCategory;
 
 interface ArtistGroup {
   name: string;
-  photos: Article[];
+  photos: Photo[];
   category: ArtistCategory;
 }
 
@@ -183,9 +183,9 @@ export function GalleryClient({ artistGroups, locale }: Props) {
                   className="group flex flex-col items-center gap-2 focus:outline-none"
                 >
                   <div className="relative w-full aspect-square rounded-full overflow-hidden bg-muted ring-2 ring-transparent group-hover:ring-primary/60 transition-all duration-200">
-                    {coverPhoto?.thumbnail_url ? (
+                    {coverPhoto?.url ? (
                       <Image
-                        src={coverPhoto.thumbnail_url}
+                        src={coverPhoto.url}
                         alt={group.name}
                         fill
                         className="object-cover object-top transition-transform duration-500 group-hover:scale-110"
@@ -254,16 +254,16 @@ export function GalleryClient({ artistGroups, locale }: Props) {
 
         {/* 사진 그리드 */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1">
-          {photos.map((article, idx) => {
-            const title = isKo ? article.title_ko : (article.title_en ?? article.title_ko);
+          {photos.map((photo, idx) => {
+            const title = isKo ? photo.title_ko : (photo.title_en ?? photo.title_ko);
             return (
               <button
-                key={article.id}
+                key={`${photo.article_id}-${idx}`}
                 onClick={() => openAt(idx)}
                 className="group relative aspect-square overflow-hidden bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <Image
-                  src={article.thumbnail_url!}
+                  src={photo.url}
                   alt={title ?? ""}
                   fill
                   className="object-cover object-top transition-transform duration-500 group-hover:scale-110"
@@ -301,7 +301,7 @@ export function GalleryClient({ artistGroups, locale }: Props) {
 
           <div className="relative max-h-[85vh] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img key={current.id} src={current.thumbnail_url!} alt={selectedArtist.name} className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain shadow-2xl" />
+            <img key={current.url} src={current.url} alt={selectedArtist.name} className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain shadow-2xl" />
             <div className="absolute bottom-0 left-0 right-0 rounded-b-lg bg-gradient-to-t from-black/90 via-black/50 to-transparent px-4 pb-4 pt-12">
               <p className="font-bold text-sm text-white">{selectedArtist.name}</p>
               <p className="mt-0.5 text-xs text-white/70 line-clamp-1">
@@ -326,9 +326,9 @@ export function GalleryClient({ artistGroups, locale }: Props) {
               const idx = Math.max(0, lightboxIndex! - 4) + i;
               const isCurrent = idx === lightboxIndex;
               return (
-                <button key={p.id} onClick={(e) => { e.stopPropagation(); setLightboxIndex(idx); }} className={`pointer-events-auto shrink-0 h-12 w-12 overflow-hidden rounded transition-all duration-200 ${isCurrent ? "ring-2 ring-white scale-110 opacity-100" : "opacity-40 hover:opacity-70"}`}>
+                <button key={`${p.article_id}-${idx}`} onClick={(e) => { e.stopPropagation(); setLightboxIndex(idx); }} className={`pointer-events-auto shrink-0 h-12 w-12 overflow-hidden rounded transition-all duration-200 ${isCurrent ? "ring-2 ring-white scale-110 opacity-100" : "opacity-40 hover:opacity-70"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.thumbnail_url!} alt="" className="h-full w-full object-cover object-top" />
+                  <img src={p.url} alt="" className="h-full w-full object-cover object-top" />
                 </button>
               );
             })}

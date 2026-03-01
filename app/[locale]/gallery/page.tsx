@@ -1,5 +1,5 @@
 import { articlesApi, artistsApi, groupsApi } from "@/lib/api";
-import type { Article } from "@/lib/types";
+import type { Article, Photo } from "@/lib/types";
 import { GalleryClient } from "./GalleryClient";
 
 type ArtistCategory = "boy_group" | "girl_group" | "mixed_group" | "male_solo" | "female_solo" | "unknown";
@@ -58,11 +58,21 @@ export default async function GalleryPage({
   }
 
   // 아티스트별 그룹화 — 아티스트명 없는 항목(기타) 제외, 중복 썸네일 제거
-  const artistMap = new Map<string, { name: string; photos: Article[]; seenUrls: Set<string> }>();
+  const artistMap = new Map<string, { name: string; photos: Photo[]; seenUrls: Set<string> }>();
+
+  function addPhoto(artistName: string, photo: Photo) {
+    if (!artistMap.has(artistName)) {
+      artistMap.set(artistName, { name: artistName, photos: [], seenUrls: new Set() });
+    }
+    const group = artistMap.get(artistName)!;
+    const norm = normalizeUrl(photo.url);
+    if (!group.seenUrls.has(norm)) {
+      group.seenUrls.add(norm);
+      group.photos.push(photo);
+    }
+  }
 
   for (const article of articles) {
-    if (!article.thumbnail_url) continue;
-
     const artistName = isKo
       ? article.artist_name_ko
       : (article.artist_name_en ?? article.artist_name_ko);
@@ -70,17 +80,27 @@ export default async function GalleryPage({
     // 아티스트명 없으면 건너뜀 (기타 카테고리 제거)
     if (!artistName) continue;
 
-    if (!artistMap.has(artistName)) {
-      artistMap.set(artistName, { name: artistName, photos: [], seenUrls: new Set() });
+    // 대표 썸네일
+    if (article.thumbnail_url) {
+      addPhoto(artistName, {
+        url: article.thumbnail_url,
+        article_id: article.id,
+        title_ko: article.title_ko,
+        title_en: article.title_en,
+        source_url: article.source_url,
+      });
     }
 
-    const group = artistMap.get(artistName)!;
-    const normalized = normalizeUrl(article.thumbnail_url);
-
-    // 정규화된 URL로 중복 제거 (쿼리스트링 차이 무시)
-    if (!group.seenUrls.has(normalized)) {
-      group.seenUrls.add(normalized);
-      group.photos.push(article);
+    // 기사 내 추가 사진
+    for (const img of (article.extra_images ?? [])) {
+      if (!img.url) continue;
+      addPhoto(artistName, {
+        url: img.url,
+        article_id: article.id,
+        title_ko: article.title_ko,
+        title_en: article.title_en,
+        source_url: article.source_url,
+      });
     }
   }
 
